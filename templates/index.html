@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Zomato AI · Sentiment Analysis</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    >
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f8f8;
+            color: #1c1c1c;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar-custom {
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 14px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #ef4f5f;
+            background: #fff1f0;
+            padding: 6px 20px;
+            border-radius: 40px;
+        }
+
+        .navbar-brand i {
+            margin-right: 6px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #2d2d2d !important;
+            margin: 0 8px;
+            padding: 8px 16px !important;
+            border-radius: 30px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #f1f1f1;
+            color: #ef4f5f !important;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero-section {
+            background: linear-gradient(
+                135deg,
+                #fce8e6 0%,
+                #fef6f5 100%
+            );
+
+            padding: 4rem 0 3.5rem;
+
+            border-radius: 0 0 40px 40px;
+
+            margin-bottom: 2rem;
+
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-weight: 700;
+            font-size: 2.8rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-section h1 span {
+            background: #ef4f5f;
+            color: white;
+            padding: 4px 20px;
+            border-radius: 60px;
+            font-size: 2.2rem;
+        }
+
+        .hero-section p {
+            font-size: 1.15rem;
+            color: #4a4a4a;
+            max-width: 650px;
+            margin: 1rem auto 0;
+        }
+
+        /* ================= CARD ================= */
+
+        .card-soft {
+            background: #ffffff;
+            border: none;
+            border-radius: 32px;
+
+            box-shadow:
+                0 12px 40px rgba(0, 0, 0, 0.04),
+                0 4px 16px rgba(0, 0, 0, 0.02);
+
+            padding: 2.5rem 2rem;
+        }
+
+        .card-soft h3 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .card-soft h3 i {
+            color: #ef4f5f;
+        }
+
+        /* ================= TEXTAREA ================= */
+
+        .form-label {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            border-radius: 20px;
+            border: 1.5px solid #ececec;
+            padding: 15px 18px;
+            font-size: 0.95rem;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            border-color: #ef4f5f;
+            box-shadow: 0 0 0 4px rgba(239, 79, 95, 0.12);
+            background: white;
+        }
+
+        textarea.form-control {
+            min-height: 170px;
+            resize: vertical;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .btn-zomato {
+            background: #ef4f5f;
+            border: none;
+            color: white;
+
+            font-weight: 600;
+
+            padding: 14px 44px;
+
+            border-radius: 60px;
+
+            font-size: 1.05rem;
+
+            box-shadow:
+                0 8px 24px rgba(239, 79, 95, 0.25);
+
+            transition: 0.2s;
+        }
+
+        .btn-zomato:hover {
+            background: #d93b4b;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .btn-zomato i {
+            margin-right: 8px;
+        }
+
+        /* ================= SENTIMENT RESULT ================= */
+
+        .sentiment-box {
+            border-radius: 28px;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-top: 25px;
+        }
+
+        .positive {
+            background: #eaf7ee;
+            border: 1px solid #ccebd5;
+            color: #258347;
+        }
+
+        .negative {
+            background: #fff0f0;
+            border: 1px solid #f3cccc;
+            color: #d93b4b;
+        }
+
+        .neutral {
+            background: #eef5fb;
+            border: 1px solid #d2e3f3;
+            color: #3574a8;
+        }
+
+        /* ================= MODEL INFO ================= */
+
+        .metric-card {
+            background: #fafafa;
+            border-radius: 22px;
+            padding: 22px;
+            text-align: center;
+            border: 1px solid #eeeeee;
+        }
+
+        .metric-card h4 {
+            color: #ef4f5f;
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-card p {
+            color: #666;
+            margin: 0;
+        }
+
+        /* ================= INFO ================= */
+
+        .info-item {
+            background: #fafafa;
+            border-radius: 20px;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .info-item i {
+            color: #ef4f5f;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .info-item h5 {
+            font-weight: 600;
+        }
+
+        .info-item p {
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        /* ================= ERROR ================= */
+
+        .error-box {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffe69c;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer-custom {
+            background: white;
+            border-top: 1px solid #ececec;
+            padding: 2.2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            color: #6b6b6b;
+        }
+
+        .footer-custom i {
+            color: #ef4f5f;
+            margin: 0 4px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 768px) {
+
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .hero-section h1 span {
+                font-size: 1.7rem;
+            }
+
+            .card-soft {
+                padding: 1.8rem 1.2rem;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ===================================================== -->
+<!-- NAVBAR -->
+<!-- ===================================================== -->
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+
+    <div class="container">
+
+        <a class="navbar-brand" href="#">
+
+            <i class="fas fa-utensils"></i>
+
+            Zomato<span
+                style="font-weight:300; color:#2d2d2d;">
+                AI
+            </span>
+
+        </a>
+
+
+        <div class="ms-auto">
+
+            <a
+                class="nav-link active d-inline-block"
+                href="#sentiment"
+            >
+                <i class="fas fa-face-smile me-1"></i>
+
+                Sentiment
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ===================================================== -->
+<!-- HERO -->
+<!-- ===================================================== -->
+
+<section class="hero-section">
+
+    <div class="container">
+
+        <h1>
+
+            Understand your
+
+            <span>
+                reviews
+            </span>
+
+        </h1>
+
+
+        <p>
+
+            Enter a customer review and let AI
+            understand whether the experience was
+            positive, neutral, or negative.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- SENTIMENT ANALYSIS -->
+<!-- ===================================================== -->
+
+<section
+    class="container"
+    id="sentiment"
+>
+
+    <div class="card-soft">
+
+        <h3>
+
+            <i class="fas fa-face-smile"></i>
+
+            Review Sentiment Analysis
+
+        </h3>
+
+
+        <p class="text-center text-muted mt-3">
+
+            Enter a customer review to predict
+            its sentiment.
+
+        </p>
+
+
+        <!-- FORM -->
+
+        <form
+            method="POST"
+            action="/"
+            class="mt-4"
+        >
+
+            <input
+                type="hidden"
+                name="action"
+                value="sentiment"
+            >
+
+
+            <label
+                class="form-label"
+                for="review"
+            >
+
+                <i class="fas fa-comment-dots me-1"></i>
+
+                Customer Review
+
+            </label>
+
+
+            <textarea
+                id="review"
+                name="review"
+                class="form-control"
+                placeholder="Write your review... e.g. The food was amazing and the staff was very friendly."
+                required
+            >{{ request.form.get('review', '') }}</textarea>
+
+
+            <div class="text-center mt-4">
+
+                <button
+                    type="submit"
+                    class="btn btn-zomato"
+                >
+
+                    <i class="fas fa-microchip"></i>
+
+                    Predict Sentiment
+
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <!-- ================================================= -->
+        <!-- RESULT -->
+        <!-- ================================================= -->
+
+        {% if sentiment_result %}
+
+            {% if sentiment_result|lower == "positive" %}
+
+                <div class="sentiment-box positive">
+
+                    😊 Positive Review
+
+                </div>
+
+
+            {% elif sentiment_result|lower == "negative" %}
+
+                <div class="sentiment-box negative">
+
+                    😞 Negative Review
+
+                </div>
+
+
+            {% elif sentiment_result|lower == "neutral" %}
+
+                <div class="sentiment-box neutral">
+
+                    😐 Neutral Review
+
+                </div>
+
+
+            {% else %}
+
+                <div class="sentiment-box">
+
+                    Predicted Sentiment:
+                    {{ sentiment_result }}
+
+                </div>
+
+            {% endif %}
+
+        {% endif %}
+
+
+        <!-- ERROR -->
+
+        {% if error_message %}
+
+            <div class="error-box">
+
+                ⚠️ {{ error_message }}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- MODEL EVALUATION -->
+<!-- ===================================================== -->
+
+<section class="container mt-5">
+
+    <div class="card-soft">
+
+        <h3>
+
+            <i class="fas fa-chart-column"></i>
+
+            Model Evaluation
+
+        </h3>
+
+
+        <p class="text-center text-muted mt-3">
+
+            Performance of the sentiment analysis model
+            used in this project.
+
+        </p>
+
+
+        <div class="row g-4 mt-3">
+
+            <div class="col-md-4">
+
+                <div class="metric-card">
+
+                    <h4>81.97%</h4>
+
+                    <p>
+                        Accuracy
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="metric-card">
+
+                    <h4>0.79</h4>
+
+                    <p>
+                        Weighted F1 Score
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="metric-card">
+
+                    <h4>3</h4>
+
+                    <p>
+                        Sentiment Classes
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- HOW IT WORKS -->
+<!-- ===================================================== -->
+
+<section class="container mt-5">
+
+    <div class="card-soft">
+
+        <h3>
+
+            <i class="fas fa-microchip"></i>
+
+            How It Works
+
+        </h3>
+
+
+        <div class="row g-4 mt-3">
+
+            <div class="col-md-4">
+
+                <div class="info-item text-center">
+
+                    <i class="fas fa-comment"></i>
+
+                    <h5>
+                        1. Customer Review
+                    </h5>
+
+                    <p>
+                        Enter a restaurant review
+                        into the application.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="info-item text-center">
+
+                    <i class="fas fa-file-lines"></i>
+
+                    <h5>
+                        2. TF-IDF
+                    </h5>
+
+                    <p>
+                        The review text is converted
+                        into numerical features.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="info-item text-center">
+
+                    <i class="fas fa-brain"></i>
+
+                    <h5>
+                        3. Prediction
+                    </h5>
+
+                    <p>
+                        Logistic Regression predicts
+                        Positive, Neutral, or Negative.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- BUSINESS INSIGHTS -->
+<!-- ===================================================== -->
+
+<section class="container mt-5">
+
+    <div class="card-soft">
+
+        <h3>
+
+            <i class="fas fa-lightbulb"></i>
+
+            Business Insights
+
+        </h3>
+
+
+        <div class="row g-4 mt-3">
+
+            <div class="col-md-4">
+
+                <div class="info-item">
+
+                    <i class="fas fa-star"></i>
+
+                    <h5>
+                        Customer Experience
+                    </h5>
+
+                    <p>
+                        Positive and negative reviews
+                        can help understand customer
+                        satisfaction.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="info-item">
+
+                    <i class="fas fa-chart-line"></i>
+
+                    <h5>
+                        Service Improvement
+                    </h5>
+
+                    <p>
+                        Negative reviews can highlight
+                        areas that require improvement.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="info-item">
+
+                    <i class="fas fa-comments"></i>
+
+                    <h5>
+                        Review Monitoring
+                    </h5>
+
+                    <p>
+                        Large numbers of reviews can be
+                        automatically classified.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer class="footer-custom">
+
+    <div class="container">
+
+        <p class="mb-0">
+
+            <i class="fas fa-utensils"></i>
+
+            2026 · Zomato Restaurant Sentiment Analysis
+
+            <span style="color:#d93b4b;">
+                •
+            </span>
+
+            Built with
+
+            <i class="fas fa-heart"></i>
+
+            for foodies
+
+        </p>
+
+    </div>
+
+</footer>
+
+
+</body>
+
+</html>
