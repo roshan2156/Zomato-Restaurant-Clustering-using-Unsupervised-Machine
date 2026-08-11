@@ -22,7 +22,7 @@ Analyzing this data manually is difficult, so Machine Learning is used to identi
 - Logistic Regression
 
 **Best Clustering Model:** DBSCAN  
-**Silhouette Score:** 0.5192
+**Silhouette Score:** 0.4839
 
 ## 💬 Sentiment Analysis
 
